@@ -1,4 +1,6 @@
-A simple component that holds an NFT and generates a Proof of it on demand, optionally against payment of a fee, for a limited amount of time.
+A simple blueprint that instantiates a component that holds an NFT and generates a Proof of it on demand, optionally against payment of a fee, for a limited amount of time.
+
+The Proof can be used during a transaction.
 
 ## Package
 ### Mainnet
