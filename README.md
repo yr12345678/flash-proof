@@ -11,12 +11,12 @@ A struct containing info about fees to be paid, with the following fields:
 * `resource`: ResourceAddress
 * `amount`: Decimal
 
-## Interface
+## Methods
 ### instantiate
 Instantiates a new FlashProof component. Requiring a fee to be paid for Proof generation is optional. An end time is required however, as unlimited Proof generation can be potentially dangerous if it's forgotten about and circumstances change. You can always update the end timestamp.
 #### Input
 * `nft`: NonFungibleBucket - The NFT that you wish to make available for Proof generation
-* `fee_info`: Option<FeeInfo> - Optionally set a fee to be paid
+* `fee_info`: Option\<FeeInfo\> - Optionally set a fee to be paid
 * `end_timestamp`: Instant - When should Proof generation stop
 
 #### Output
