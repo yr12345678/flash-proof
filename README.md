@@ -4,8 +4,10 @@ The Proof can be used during a transaction.
 
 ## Package
 ### Mainnet
+`package_rdx1phcw0993dpezja7crhf982s072z6v8ts2z0h8u4j8z5qcgygprds0t`
 
 ### Stokenet
+`package_tdx_2_1p40nq4a2f09ztx9x0yn42wcqzxjhrmz2npra7ynfphd8ek92x7qgj0`
 
 ## Types
 ### FeeInfo
@@ -84,3 +86,160 @@ Generates a Proof for the NFT stored in the component and returns that with any 
 #### Output
 * The Proof of the NFT
 * An Option: either a remainder of the payment or None (if no payment was provided)
+
+## Manifest examples
+### Instantiate a component
+```
+CALL_METHOD
+  Address("YOUR_ACCOUNT")
+  "withdraw_non_fungibles"
+  Address("NFT_RESOURCE")
+  Array<NonFungibleLocalId>(
+    NonFungibleLocalId("NFT_ID")
+  )
+;
+
+TAKE_ALL_FROM_WORKTOP
+  Address("NFT_RESOURCE")
+  Bucket("nft")
+;
+
+CALL_FUNCTION
+  Address("package_rdx1phcw0993dpezja7crhf982s072z6v8ts2z0h8u4j8z5qcgygprds0t") # Mainnet
+  "FlashProof"
+  "instantiate"
+  Bucket("nft")
+  # Apply a fee of 420 $EARLY. Replace with Enum<0u8>() or None to instantiate without a fee requirement.
+  Enum<1u8>(
+    Tuple(
+      Address("resource_rdx1t5xv44c0u99z096q00mv74emwmxwjw26m98lwlzq6ddlpe9f5cuc7s"),
+      Decimal("420")
+    )
+  )
+  1729756098i64
+;
+
+CALL_METHOD
+  Address("YOUR_ACCOUNT")
+  "deposit_batch"
+  Expression("ENTIRE_WORKTOP")
+;
+```
+
+### Update the end timestamp
+```
+CALL_METHOD
+  Address("YOUR_ACCOUNT")
+  "create_proof_of_amount"
+  Address("YOUR_OWNER_BADGE_RESOURCE")
+  Decimal("1")
+;
+
+CALL_METHOD
+  Address("YOUR_FLASH_PROOF_COMPONENT")
+  "update_end_timestamp"
+  1731000886i64
+;
+```
+
+### Update the fee
+```
+CALL_METHOD
+  Address("YOUR_ACCOUNT")
+  "create_proof_of_amount"
+  Address("YOUR_OWNER_BADGE_RESOURCE")
+  Decimal("1")
+;
+
+CALL_METHOD
+  Address("YOUR_FLASH_PROOF_COMPONENT")
+  "update_fee"
+  Decimal("69")
+;
+```
+
+### Withdraw your NFT
+```
+CALL_METHOD
+  Address("YOUR_ACCOUNT")
+  "create_proof_of_amount"
+  Address("YOUR_OWNER_BADGE_RESOURCE")
+  Decimal("1")
+;
+
+CALL_METHOD
+  Address("YOUR_FLASH_PROOF_COMPONENT")
+  "withdraw_nft"
+;
+
+CALL_METHOD
+  Address("YOUR_ACCOUNT")
+  "deposit_batch"
+  Expression("ENTIRE_WORKTOP")
+;
+```
+
+### Withdraw your fees
+```
+CALL_METHOD
+  Address("YOUR_ACCOUNT")
+  "create_proof_of_amount"
+  Address("YOUR_OWNER_BADGE_RESOURCE")
+  Decimal("1")
+;
+
+CALL_METHOD
+  Address("YOUR_FLASH_PROOF_COMPONENT")
+  "withdraw_fees"
+;
+
+CALL_METHOD
+  Address("YOUR_ACCOUNT")
+  "deposit_batch"
+  Expression("ENTIRE_WORKTOP")
+;
+```
+
+### Use Flash Proof in a transaction
+```
+# Scenario assumes a fee is required
+CALL_METHOD
+  Address("YOUR_ACCOUNT")
+  "withdraw"
+  Address("FEE_RESOURCE")
+  Decimal("FEE_AMOUNT")
+;
+
+TAKE_ALL_FROM_WORKTOP
+  Address("FEE_RESOURCE")
+  Bucket("fee_payment")
+;
+
+# Get the Proof from the Flash Proof component
+CALL_METHOD
+  Address("FLASH_PROOF_COMPONENT")
+  "get_nft_proof"
+  Enum<1u8>(Bucket("fee_payment"))
+;
+
+# Proof ended up in the auth zone from which it can be used if the
+# method you're calling doesn't require it explicitly as an input.
+# Use the POP_FROM_AUTH_ZONE below to create a named Proof that
+# you can use as input for a method if required.
+POP_FROM_AUTH_ZONE
+  Proof("my_flash_proof")
+;
+
+# Call the method using the Proof as an input.
+CALL_METHOD
+  Address("SOME_COMPONENT")
+  "some_method"
+  Proof("my_flash_rpoof") # Only required if the method explicitly wants the Proof as an input
+;
+
+CALL_METHOD
+  Address("YOUR_ACCOUNT")
+  "deposit_batch"
+  Expression("ENTIRE_WORKTOP")
+;
+```
