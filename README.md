@@ -289,7 +289,7 @@ POP_FROM_AUTH_ZONE
 CALL_METHOD
   Address("SOME_COMPONENT")
   "some_method"
-  Proof("my_flash_rpoof") # Only required if the method explicitly wants the Proof as an input
+  Proof("my_flash_proof") # Only required if the method explicitly wants the Proof as an input
 ;
 
 CALL_METHOD
